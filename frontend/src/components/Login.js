@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import axios from 'axios';
-import './Login.css'
+import { getLoggedinUser } from '../actions/user';
+import './Login.css';
 
 class Login extends Component {
     constructor(props) {
@@ -19,7 +21,7 @@ class Login extends Component {
         e.preventDefault();
         const { data } = await axios.post('/login', { ...this.state });
         if (data.success) {
-            this.props.updateUserState();
+            this.props.getLoggedinUser();
             this.props.history.push('/');
         } else if (data.flashMessage && data.flashMessage.length) {
             alert(data.flashMessage.join('\n'));
@@ -49,4 +51,6 @@ class Login extends Component {
     }
 }
 
-export default Login;
+const mapDispatchToProps = { getLoggedinUser };
+
+export default connect(null, mapDispatchToProps)(Login);

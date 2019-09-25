@@ -1,62 +1,48 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import 'bootstrap/dist/css/bootstrap.css';
 import './App.css';
 import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
 import axios from 'axios';
-import Loader from "./components/Loader";
+import Loader from "./common/Loader";
 import Home from './components/Home';
 import Login from './components/Login';
+import { getLoggedinUser } from './actions/user';
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      user: {},
-      loading: true,
-    }
-  }
-
   componentDidMount() {
-    this.updateUserState();
+    this.props.getLoggedinUser();
   }
 
-  updateUserState = async () => {
-    if (!this.isLoggedin()) {
-      const { data } = await axios.get('/loggedinUser');
-
-      const newState = { loading: false };
-      if (data.name && data.email) {
-        newState.user = data;
-      }
-
-      this.setState(newState);
-    }
-  }
-
-  isLoggedin = () => Object.entries(this.state.user).length > 0;
+  isLoggedin = () => Object.entries(this.props.user).length > 0;
 
   routes = () => {
-    let routes = <Loader />;
-    const loginRoute = <Route path="/login" render={props => <Login updateUserState={this.updateUserState} {...props}></Login>}></Route>;
-    if (!this.state.loading && this.isLoggedin()) {
-      // Insert routes here
-      routes = (<div>
-        <Route exact path="/" component={Home}></Route>
-        {loginRoute}
-      </div>);
-    } else if (!this.state.loading) {
-      routes = (<div>
-        {loginRoute}
-        <Redirect to="/login" />
-      </div>);
+    let routes;
+    const user = this.props.user;
+
+    if (user === null) {
+      routes = <Loader />;
+    } else {
+      const isLoggedin = Object.entries(this.props.user).length > 0;
+      const loginRoute = <Route exact path="/login" component={Login}></Route>
+      if (isLoggedin) {
+        // Insert routes here
+        routes = (<div>
+          <Route exact path="/" component={Home}></Route>
+          {loginRoute}
+        </div>);
+      } else {
+        routes = (<div>
+          {loginRoute}
+          <Redirect to="/login" />
+        </div>);
+      }
     }
 
     return routes;
   }
 
   render() {
-
     return (
       <div className="container py-2">
         <Router>
@@ -67,4 +53,12 @@ class App extends Component {
   }
 }
 
-export default App;
+function mapStateToProps(state) {
+  return {
+    user: state.userReducer
+  };
+}
+
+const mapDispatchToProps = { getLoggedinUser };
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
