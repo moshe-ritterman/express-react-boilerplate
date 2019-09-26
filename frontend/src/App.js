@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import 'bootstrap/dist/css/bootstrap.css';
 import './App.css';
 import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
-import axios from 'axios';
 import Loader from "./common/Loader";
 import Home from './components/Home';
 import Login from './components/Login';
