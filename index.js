@@ -13,9 +13,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
-    secret: 'my-secret',
-    resave: false,
-    saveUninitialized: true,
+	secret: 'my-secret',
+	resave: false,
+	saveUninitialized: true,
 }));
 app.use(flash());
 app.use(passport.initialize());
